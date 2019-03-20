@@ -6,11 +6,19 @@
 
 import UIKit
 
+protocol ChangeCityDelegate {
+    func userEnteredANewCityName(city : String)
+    
+}
 
 
 
 
 class ChangeCityViewController: UIViewController {
+    
+    var delegate : ChangeCityDelegate?
+    
+    
     
    
     @IBOutlet weak var changeCityTextField: UITextField!
@@ -18,10 +26,11 @@ class ChangeCityViewController: UIViewController {
     
     @IBAction func getWeatherPressed(_ sender: AnyObject) {
         
+        let cityName = changeCityTextField.text!
         
+        delegate?.userEnteredANewCityName(city: cityName)
         
-        
-        
+        self.dismiss(animated: true, completion: nil)
         
     }
     
