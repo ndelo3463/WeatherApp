@@ -11,17 +11,12 @@ import SwiftyJSON
 
 class WeatherViewController: UIViewController, CLLocationManagerDelegate, ChangeCityDelegate {
     
-    @IBOutlet weak var faren: UISwitch!
+  
    
     let WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather"
     let APP_ID = "30cc3152886a5e4bd4ed0a6da491232c"
     
-    @IBAction func `switch`(_ sender: UISwitch) {
-        
-        if sender.isOn {
-            
-        }
-    }
+  
     
   
     let locationManager = CLLocationManager()
@@ -87,7 +82,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         
         let tempResult = json["main"]["temp"].doubleValue
         
-        weatherDataModel.temperature = Int(tempResult - 273.15)
+        weatherDataModel.temperature = (Int(tempResult - 273.15) * 9 / 5) + 32
         
         weatherDataModel.city = json["name"].stringValue
         
