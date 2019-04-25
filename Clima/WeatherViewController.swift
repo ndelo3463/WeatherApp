@@ -45,38 +45,40 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     }
     
     
-    
-    
-    
-    
-  
-    
     func getWeatherData(url: String, parameters: [String: String]) {
         
-        Alamofire.request(url, method: .get, parameters: parameters).responseJSON {
-            response in
-            if response.result.isSuccess {
-                
-                print("Success! Got the weather data")
-                let weatherJSON : JSON = JSON(response.result.value!)
-                
-                
+//        Alamofire.request(url, method: .get, parameters: parameters).responseJSON {
+//            response in
+//            if response.result.isSuccess {
+//
+//                print("Success! Got the weather data")
+//                let weatherJSON : JSON = JSON(response.result.value!)
+        
+        let session = URLSession(configuration: .default)
+        var datatask : URLSessionDataTask?
+        let url = WEATHER_URL
+        var items = [URLQueryItem]()
+        var myURL = URLComponents(string: url)
+        let param = parameters
+        for (key,value) in param {
+            items.append(URLQueryItem(name: key, value: value))
+        }
+        myURL?.queryItems = items
+        let request =  URLRequest(url: (myURL?.url)!)
+        
+        datatask = session.dataTask(with: request, completionHandler: {data, response, error in
+            if error == nil {
+                let weatherJSON:JSON = try! JSONSerialization.jsonObject(with: data!, options: []) as! JSON
+               
                 print(weatherJSON)
                 
                 self.updateWeatherData(json: weatherJSON)
-                
+           
             }
-            else {
-                print("Error \(String(describing: response.result.error))")
-                self.cityLabel.text = "Connection Issues"
-            }
+       })
+        datatask?.resume()
         }
-        
-    }
-    
-    
- 
-    
+
     
     func updateWeatherData(json : JSON) {
         
