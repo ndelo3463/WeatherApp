@@ -155,7 +155,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0700;
-				LastUpgradeCheck = 0900;
+				LastUpgradeCheck = 1010;
 				ORGANIZATIONNAME = "London App Brewery";
 				TargetAttributes = {
 					63E28ACA1B99C32400FBF6E0 = {

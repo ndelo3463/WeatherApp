@@ -68,11 +68,12 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         
         datatask = session.dataTask(with: request, completionHandler: {data, response, error in
             if error == nil {
-                let weatherJSON:JSON = try! JSONSerialization.jsonObject(with: data!, options: []) as! JSON
+                let weatherJSON = try? JSON(data: data!)
                
-                print(weatherJSON)
                 
-                self.updateWeatherData(json: weatherJSON)
+                print(weatherJSON!)
+                
+                self.updateWeatherData(json: weatherJSON!)
            
             }
        })
