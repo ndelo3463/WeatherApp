@@ -9,6 +9,9 @@ import CoreLocation
 import Alamofire
 import SwiftyJSON
 
+
+
+
 class WeatherViewController: UIViewController, CLLocationManagerDelegate, ChangeCityDelegate {
    
     
@@ -18,7 +21,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     let WEATHER_URL = "http://api.openweathermap.org/data/2.5/weather"
     let APP_ID = "30cc3152886a5e4bd4ed0a6da491232c"
     
-  
+   
     
   
     let locationManager = CLLocationManager()
@@ -38,6 +41,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         super.viewDidLoad()
         
         
+      
         
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
@@ -47,8 +51,18 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     }
     
     
+    struct Weather: Codable {
+        var temperature : Double
+        var condition : Int
+        var city : String
+        var weatherIconName : String
+    }
+    
+    
     func getWeatherData<Weather: Codable>(url: String, parameters: [String: String], completion: @escaping (Weather) -> Void) {
         
+        
+       
 //        Alamofire.request(url, method: .get, parameters: parameters).responseJSON {
 //            response in
 //            if response.result.isSuccess {
@@ -68,37 +82,35 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         myURL?.queryItems = items
         let request =  URLRequest(url: (myURL?.url)!)
         
+        
         datatask = session.dataTask(with: request, completionHandler: {data, response, error in
             guard let data = data else {return}
                 do {
-                    let responseObject = try JSONDecoder().decode(Weather.self, from: data)
-                    completion(responseObject)
-                    print(responseObject)
+                    let weatherJSON = try JSONDecoder().decode(Weather.self, from: data)
+                    completion(weatherJSON)
+                    print(weatherJSON)
                 } catch let jsonError {
                     print(jsonError)
                 
+            
+                    
             }
             datatask!.resume()
+            
+            
         }
     ) }
 
 
-                struct Weather: Codable {
-                    var temperature : Int = 0
-                    var condition : Int = 0
-                    var city : String = ""
-                    var weatherIconName : String = ""
-                }
-                
+    
+    
 
-
-                
-                
+    
+    
 //                self.updateWeatherData(json: weatherJSON!)
            
-            
-      
-
+    
+    
     
 //    func updateWeatherData(json : JSON) {
 //
@@ -115,16 +127,19 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
 //
 //        updateUIWithWeatherData()
 //    }
+   
+ 
+    var city = Weather.city
+    var temperature = Weather.temperature
+    var iconImage = Weather.weatherIconName
     
-    
-
     
     func updateUIWithWeatherData() {
         
-        cityLabel.text = weatherDataModel.city
-        temperatureLabel.text = "\(weatherDataModel.temperature)°"
-        weatherIcon.image = UIImage(named: weatherDataModel.weatherIconName)
-        
+        cityLabel.text = city
+        temperatureLabel.text = "\(temperature)"
+        weatherIcon.image = UIImage(named: iconImage)
+
     }
     
     
@@ -134,8 +149,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         let location = locations[locations.count - 1]
         if location.horizontalAccuracy > 0 {
             
-            self.locationManager.stopUpdatingLocation()
-            
+            self.locationManager.stopUpdatingLocation()            
             print("longitude = \(location.coordinate.longitude), latitude = \(location.coordinate.latitude)")
             
             let latitude = String(location.coordinate.latitude)
@@ -146,6 +160,8 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             
             
             getWeatherData(url: WEATHER_URL, parameters: params, completion: (Weather) -> Void)
+            
+            updateUIWithWeatherData()
         }
     }
     
@@ -158,7 +174,6 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     
     
     
-    
 
     
     
@@ -167,6 +182,8 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         let params : [String : String] = ["q" : city, "appid" : APP_ID]
         
         getWeatherData(url: WEATHER_URL, parameters: params, completion: (Weather) -> Void)
+        
+        updateUIWithWeatherData()
         
     }
     
