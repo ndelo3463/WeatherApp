@@ -10,6 +10,8 @@ import Alamofire
 import SwiftyJSON
 
 class WeatherViewController: UIViewController, CLLocationManagerDelegate, ChangeCityDelegate {
+   
+    
     
   
    
@@ -45,7 +47,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
     }
     
     
-    func getWeatherData(url: String, parameters: [String: String]) {
+    func getWeatherData<Weather: Codable>(url: String, parameters: [String: String], completion: @escaping (Weather) -> Void) {
         
 //        Alamofire.request(url, method: .get, parameters: parameters).responseJSON {
 //            response in
@@ -67,35 +69,52 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         let request =  URLRequest(url: (myURL?.url)!)
         
         datatask = session.dataTask(with: request, completionHandler: {data, response, error in
-            if error == nil {
-                let weatherJSON = try? JSON(data: data!)
-               
+            guard let data = data else {return}
+                do {
+                    let responseObject = try JSONDecoder().decode(Weather.self, from: data)
+                    completion(responseObject)
+                    print(responseObject)
+                } catch let jsonError {
+                    print(jsonError)
                 
-                print(weatherJSON!)
-                
-                self.updateWeatherData(json: weatherJSON!)
-           
             }
-       })
-        datatask?.resume()
+            datatask!.resume()
         }
+    ) }
+
+
+                struct Weather: Codable {
+                    var temperature : Int = 0
+                    var condition : Int = 0
+                    var city : String = ""
+                    var weatherIconName : String = ""
+                }
+                
+
+
+                
+                
+//                self.updateWeatherData(json: weatherJSON!)
+           
+            
+      
 
     
-    func updateWeatherData(json : JSON) {
-        
-        let tempResult = json["main"]["temp"].doubleValue
-        
-        weatherDataModel.temperature = (Int(tempResult - 273.15) * 9 / 5) + 32
-        
-        weatherDataModel.city = json["name"].stringValue
-        
-        weatherDataModel.condition = json["weather"][0]["id"].intValue
-        
-        weatherDataModel.weatherIconName = weatherDataModel.updateWeatherIcon(condition: weatherDataModel.condition)
-        
-        
-        updateUIWithWeatherData()
-    }
+//    func updateWeatherData(json : JSON) {
+//
+//        let tempResult = json["main"]["temp"].doubleValue
+//
+//        weatherDataModel.temperature = (Int(tempResult - 273.15) * 9 / 5) + 32
+//
+//        weatherDataModel.city = json["name"].stringValue
+//
+//        weatherDataModel.condition = json["weather"][0]["id"].intValue
+//
+//        weatherDataModel.weatherIconName = weatherDataModel.updateWeatherIcon(condition: weatherDataModel.condition)
+//
+//
+//        updateUIWithWeatherData()
+//    }
     
     
 
@@ -124,7 +143,9 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
             
             let params : [String : String] = ["lat" : latitude, "lon" : longitude, "appid" : APP_ID]
             
-            getWeatherData(url: WEATHER_URL, parameters: params)
+            
+            
+            getWeatherData(url: WEATHER_URL, parameters: params, completion: (Weather) -> Void)
         }
     }
     
@@ -145,7 +166,7 @@ class WeatherViewController: UIViewController, CLLocationManagerDelegate, Change
         
         let params : [String : String] = ["q" : city, "appid" : APP_ID]
         
-        getWeatherData(url: WEATHER_URL, parameters: params)
+        getWeatherData(url: WEATHER_URL, parameters: params, completion: (Weather) -> Void)
         
     }
     
