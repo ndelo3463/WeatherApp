@@ -14,11 +14,6 @@ class WeatherDataModel {
     var weatherIconName : String = ""
     
     
-  
-    
-    
-    
-    
     func updateWeatherIcon(condition: Int) -> String {
         
     switch (condition) {
@@ -61,9 +56,6 @@ class WeatherDataModel {
         }
 
   }
-
-
-
 
 
 
