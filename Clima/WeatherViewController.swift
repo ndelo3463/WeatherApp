@@ -6,7 +6,6 @@
 
 import UIKit
 import CoreLocation
-import Alamofire
 import SwiftyJSON
 
 class WeatherViewController: UIViewController, CLLocationManagerDelegate, ChangeCityDelegate {
